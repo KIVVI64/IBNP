@@ -1,12 +1,39 @@
 <template>
-  <div class="home">
-    <h1 class="text-center text-h1">IBNP</h1>
-    <p class="text-center text-subtitle-1">Internetowa baza nauczycieli w Polsce</p>
-    <v-form>
+  <div class="teacherAdd">
+    <v-form v-model="valid">
       <v-container>
-        <h2>Znajdź swoją szkołę</h2>
+        <h1>Dodaj nauczyciela</h1>
         <v-row>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" sm="12" md="6">
+            <v-text-field
+              v-model="fname"
+              :rules="fnameRules"
+              label="Imię"
+              required
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" sm="12" md="6">
+            <v-text-field
+              v-model="lname"
+              :rules="lnameRules"
+              label="Nazwisko"
+              required
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" sm="12">
+            <v-combobox
+              v-model="subjects"
+              :items="subjectsList"
+              label="Przedmioty"
+              multiple
+              small-chips
+              deletable-chips
+            ></v-combobox>
+          </v-col>
+
+          <v-col cols="12" sm="12" md="6">
             <v-select
               v-model="voivodeship"
               :items="voivodeships"
@@ -16,7 +43,7 @@
             ></v-select>
           </v-col>
 
-          <v-col cols="12" sm="6">
+          <v-col cols="12" sm="12" md="6">
             <v-autocomplete
               v-model="city"
               :items="cities"
@@ -41,6 +68,18 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
+        <div class="text-right">
+          <v-btn
+            rounded
+            large
+            color="primary"
+            :disabled="!valid"
+            :loading="submitLoading"
+            @click="schoolAdd()"
+          ><v-icon left>mdi-account-plus</v-icon>
+            Dodaj
+          </v-btn>
+        </div>
       </v-container>
     </v-form>
   </div>
@@ -48,14 +87,23 @@
 
 <script>
 import { schoolsCollection } from '../plugins/firebase'
+import { teachersCollection } from '../plugins/firebase'
 import { auth } from '../plugins/firebase'
 import { usersCollection } from '../plugins/firebase'
 
 export default {
-  name: 'Home',
+  name: "SchoolAdd",
   data() {
     return {
       //inputs
+      fname: null,
+      fnameRules: [
+        v => (v && v.length > 2) || 'To nie wygląda jak imię'
+      ],
+      lname: null,
+      lnameRules: [
+        v => (v && v.length > 2) || 'To nie wygląda jak nazwisko'
+      ],
       voivodeship: null,
       city: null,
       cityDisabled: true,
@@ -66,7 +114,9 @@ export default {
       school: null,
       schoolDisabled: true,
       schoolLoading: false,
+      subjects: [],
 
+      valid: false,
       submitLoading: false,
       voivodeships: [
         "Dolnośląskie",
@@ -88,7 +138,7 @@ export default {
       ],
       cities: [],
       schools: [], // lista szkół wczytywana po wybraniu miasta
-      schoolsRef: [], // id szkoły wczytywane po wybraniu szkoły
+      schoolsRef: [], // id szkoły wczytywane po wybraniu
       subjectsList: [
         "Matematyka",
         "Fizyka",
@@ -127,6 +177,17 @@ export default {
     .then(({ ip }) => {
         this.userIP = ip;
     });
+
+    //Pobieranie przedmiotów
+    teachersCollection
+      .get()
+      .then(doc => {
+        doc.forEach(elem => {
+          var sub = new Array;
+          sub = elem.data().subjects;
+          sub.forEach(el => this.subjectsList.push(el));
+        })
+      })
   },
   methods: {
     loadCities() {
@@ -174,10 +235,41 @@ export default {
           this.schoolsRef = [],
           this.schoolsRef.push(elem.id);
           console.log(this.schoolsRef[0]);
-          this.$router.push("/szkola/" + this.schoolsRef[0]);
         })
       })
+    },
+    schoolAdd() {
+      this.submitLoading = true;
+      var currentDate = new Date();
+      teachersCollection
+      .doc()
+      .set({
+        accessLevel: 0,
+        code: currentDate.getTime(),
+        date: currentDate,
+        editPoints: this.userPoints,
+        ip: this.userIP,
+        name_f: this.fname,
+        name_l: this.lname,
+        schoolsRef: this.schoolsRef,
+        subjects: this.subjects,
+        userRef: this.userID,
+        verificated: false
+      })
+      .then(() => {
+        console.log("Successfully addedd teaacherr");
+        this.submitLoading = false;
+        //tu ma być popup
+      })
+      .catch(err => {
+        console.log(err.message);
+        this.submitLoading = false;
+      });
     }
   }
 }
 </script>
+
+<style>
+
+</style>

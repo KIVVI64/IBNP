@@ -1,32 +1,95 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app id="inspire">
+    <v-navigation-drawer
+      v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      app
+      dark
+    >
+      <v-list>
+        <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          link
+          :to="item.url"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn v-if="user" @click="wyloguj()" block>Wyloguj</v-btn>
+        </div>
+      </template>
+    </v-navigation-drawer>
+
+    <v-app-bar
+      :clipped-left="$vuetify.breakpoint.lgAndUp"
+      app
+      color="light-green darken-1"
+      dark
+    >
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title
+        style="width: 300px"
+        class="ml-0 pl-4"
+      >
+        <span class="hidden-sm">IBNP</span>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+      <v-btn v-if="user" icon>
+        <v-icon>mdi-account-circle</v-icon>
+      </v-btn>
+      <v-btn v-if="!user" outlined :to="{ name: 'Login', query: { redirect: $route.fullPath } }">Login</v-btn>
+    </v-app-bar>
+    <v-main>
+      <v-container fluid>
+      <router-view></router-view>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import { auth } from './plugins/firebase'
 
-#nav {
-  padding: 30px;
-}
+export default {
+  name: 'App',
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+  props: {
+    source: String,
+  },
+  data: () => ({
+    user: auth.currentUser,
+    dialog: false,
+    drawer: false,
+    items: [
+      { title: 'Strona główna', icon: 'home', url: '/' },
+      { title: 'Dodaj szkołę', icon: 'school', url: '/szkola/dodaj' },
+      { title: 'Dodaj nauczyciela', icon: 'account-plus', url: '/nauczyciel/dodaj' },
+      { title: 'O stronie', icon: 'information', url: '/about' },
+    ],
+  }),
+  methods: {
+    wyloguj() {
+      auth.signOut();
+      this.user = null;
+    }
+  },
+  watch: {
+    '$route' (to) {
+      document.title = to.meta.title || 'IBNP'
+    }
+  }
+};
+</script>
