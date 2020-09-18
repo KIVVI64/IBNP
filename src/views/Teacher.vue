@@ -1,73 +1,109 @@
 <template>
   <div class="teacher">
-    <v-skeleton-loader
-      :loading="loading"
-      transition="fade-transition"
-      type="article"
-    >
-      <v-card flat>
-        <h1 class="display-2">{{ namef }} {{ namel }}</h1>
-        <p class="display-1">{{ new_namef }} {{ new_namel }}</p>
-        <p>Szkoła:</p>
-        <v-chip class="mr-2 mb-2" v-for="school in schoolsList" :to="{ name: 'School', params: { school_uid: school.id } }" :key="school.id" >
-          {{ school.name }}
-          <v-icon class="mr-1" small right>mdi-open-in-new</v-icon>
-        </v-chip>
-        <p>Przedmioty: </p>
-        <v-chip class="mr-2 mb-2" v-for="subject in subjects" :key="subject">
-          {{ subject }}
-        </v-chip>
-      </v-card>
-    </v-skeleton-loader>
-    
+    <v-row>
+      <v-col cols="12" sm="12" md="8" xl="9">
+        <v-card elevation="20" class="mx-auto" width="100%">
+          <v-card-text>
+            <v-skeleton-loader
+              :loading="loading"
+              transition="fade-transition"
+              type="article"
+            >
+              <v-card flat>
+                <h1 class="display-2">{{ namef }} {{ namel }}</h1>
+                <p class="display-1">{{ new_namef }} {{ new_namel }}</p>
+                <p>Szkoła:</p>
+                <v-chip class="mr-2 mb-2" v-for="school in schoolsList" :to="{ name: 'School', params: { school_uid: school.id } }" :key="school.id" >
+                  {{ school.name }}
+                  <v-icon class="mr-1" small right>mdi-open-in-new</v-icon>
+                </v-chip>
+                <p>Przedmioty: </p>
+                <v-chip class="mr-2 mb-2" v-for="subject in subjects" :key="subject">
+                  {{ subject }}
+                </v-chip>
+              </v-card>
+            </v-skeleton-loader>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+        <v-card elevation="20" class="mx-auto" width="100%">
+          <v-card-title>
+            Powiedzenia
+          </v-card-title>
+          <v-card-text>
+            <v-skeleton-loader
+              :loading="facts_loading"
+              transition="fade-transition"
+              type="list-item-three-line"
+            >
+              <v-expansion-panels accordion flat>
+                <v-expansion-panel v-for="info in says" :key="info.id">
+                  <v-expansion-panel-header>{{ info.content }}</v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <div v-if="!says[0] && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
+              </v-expansion-panels>
+            </v-skeleton-loader>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+        <v-card elevation="20" class="mx-auto" width="100%">
+          <v-card-title>
+            Ciekawostki
+          </v-card-title>
+            <v-skeleton-loader
+              :loading="saying_loading"
+              transition="fade-transition"
+              type="list-item-three-line"
+            >
+              <v-expansion-panels accordion flat>
+                <v-expansion-panel v-for="info in facts" :key="info.id">
+                  <v-expansion-panel-header>{{ info.content }}</v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+                <div v-if="!says[0] && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
+              </v-expansion-panels>
+            </v-skeleton-loader>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn outlined rounded color="secondary" dark>
+              Dodaj więcej
+            </v-btn>
+          </v-card-actions>
+        </v-card>
 
-    <h2>Powiedzenia</h2>
-    <v-skeleton-loader
-      :loading="facts_loading"
-      transition="fade-transition"
-      type="list-item-three-line"
-    >
-      <v-card flat>
-        <ul>
-          <li v-for="info in says" :key="info.id">
-            {{ info.content }}
-          </li>
-          <li v-if="!says[0]">
-            Dodaj pierwsze powiedzenie
-          </li>
-        </ul>
-      </v-card>
-    </v-skeleton-loader>
+        
 
-    <h2>Ciekawostki</h2>
-    <v-skeleton-loader
-      :loading="saying_loading"
-      transition="fade-transition"
-      type="list-item-three-line"
-    >
-      <v-card flat>
-        <ul>
-          <li v-for="info in facts" :key="info.id">
-            {{ info.content }}
-          </li>
-          <li v-if="!facts[0]">
-            Dodaj pierwszą ciekawostkę
-          </li>
-        </ul>
-      </v-card>
-    </v-skeleton-loader>
+        
 
-    <h2>Opinie</h2>
-    <p>Op1</p>
-    <p>Op2</p>
+        <h2>Opinie</h2>
+        <p>Op1</p>
+        <p>Op2</p>
+      </v-col>
+      <v-col cols="12" sm="12" md="4" xl="3">
+        <h3>Inni z tej szkoły</h3>
+        <p>Imie Nazwisko</p>
+        <p>Imie Nazwisko</p>
 
-    <h3>Inni z tej szkoły</h3>
-    <p>Imie Nazwisko</p>
-    <p>Imie Nazwisko</p>
-
-    <h3>Warto zobaczyć</h3>
-    <p>Imie Nazwisko</p>
-    <p>Imie Nazwisko</p>
+        <h3>Warto zobaczyć</h3>
+        <p>Imie Nazwisko</p>
+        <p>Imie Nazwisko</p>
+      </v-col>
+    </v-row>
 
     <v-row justify="center">
       <v-dialog v-model="dialog" max-width="600px">
@@ -293,7 +329,7 @@ export default {
         .set({
           accessLevel: 1,
           code: currentDate.getTime(),
-          content: this.content,
+          content: this.content.replace(/\r\n/g, "<br />"),
           date: currentDate,
           editPoints: this.userPoints,
           ip: this.userIP,
@@ -308,3 +344,17 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.v-card {
+  border-radius: 24px !important;
+  margin-bottom: 24px;
+}
+.blockquote-old {
+  border-left: 4px solid #8bc34a;
+  margin: 2px 0px;
+  margin-left: 5px;
+  padding: 5px;
+  min-height: 28px;
+}
+</style>
