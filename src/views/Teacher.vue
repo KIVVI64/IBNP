@@ -2,7 +2,7 @@
   <div class="teacher">
     <v-row>
       <v-col cols="12" sm="12" md="8" xl="9">
-        <v-card elevation="20" class="mx-auto" width="100%">
+        <v-card elevation="8" class="mx-auto rounded-xl" width="100%">
           <v-card-text>
             <v-skeleton-loader
               :loading="loading"
@@ -11,7 +11,7 @@
             >
               <v-card flat>
                 <h1 class="display-2">{{ namef }} {{ namel }}</h1>
-                <p class="display-1">{{ new_namef }} {{ new_namel }}</p>
+                <!--<p class="display-1">{{ new_namef }} {{ new_namel }}</p>-->
                 <p>Szkoła:</p>
                 <v-chip class="mr-2 mb-2" v-for="school in schoolsList" :to="{ name: 'School', params: { school_uid: school.id } }" :key="school.id" >
                   {{ school.name }}
@@ -31,7 +31,7 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-        <v-card elevation="20" class="mx-auto" width="100%">
+        <v-card elevation="8" class="mx-auto rounded-xl" width="100%">
           <v-card-title>
             Powiedzenia
           </v-card-title>
@@ -48,7 +48,7 @@
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <div v-if="!says[0] && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
+                <div v-if="!says.length && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
               </v-expansion-panels>
             </v-skeleton-loader>
           </v-card-text>
@@ -59,7 +59,7 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-        <v-card elevation="20" class="mx-auto" width="100%">
+        <v-card elevation="8" class="mx-auto rounded-xl" width="100%">
           <v-card-title>
             Ciekawostki
           </v-card-title>
@@ -70,12 +70,12 @@
             >
               <v-expansion-panels accordion flat>
                 <v-expansion-panel v-for="info in facts" :key="info.id">
-                  <v-expansion-panel-header>{{ info.content }}</v-expansion-panel-header>
+                  <v-expansion-panel-header class="multiline-element">{{ info.content }}</v-expansion-panel-header>
                   <v-expansion-panel-content>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <div v-if="!says[0] && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
+                <div v-if="!facts.length && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
               </v-expansion-panels>
             </v-skeleton-loader>
           <v-card-actions>
@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import { teachersCollection, schoolsCollection } from '../plugins/firebase'
+import { teachersCollection, schoolsCollection, viewsCollection } from '../plugins/firebase'
 import { factsCollection } from '../plugins/firebase'
 import { usersCollection } from '../plugins/firebase'
 import { auth } from '../plugins/firebase'
@@ -194,6 +194,7 @@ export default {
   data() {
     return {
       // Nauczyciel
+      teacherRef: null,
       namef: null,
       namel: null,
       new_namef: "Imie",
@@ -221,22 +222,26 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    //Podstawowe dane nauczycielas
+    //Podstawowe dane nauczyciela
     teachersCollection.doc(to.params.teacher_uid)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          next(vm => {
-            vm.namef = doc.data().name_f;
-            vm.namel = doc.data().name_l;
-          });
-        } else {
-          console.log("Nie znaleziono nauczyciela!", "Spadaj z tej strony");
-          next(vm => {
-            vm.erno = true;
-          })
-        }
-      });
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        next(vm => {
+          vm.teacherRef = doc.id;
+          vm.namef = doc.data().name_f;
+          vm.namel = doc.data().name_l;
+          vm.schoolsRef = doc.data().schoolsRef;
+          vm.userRef = doc.data().userRef;
+        });
+      } else {
+        console.log("Nie znaleziono nauczyciela!", "Spadaj z tej strony");
+        next(vm => {
+          vm.erno = true;
+        })
+      }
+    });
+
   },
   created() {
     // Dane usera
@@ -257,29 +262,47 @@ export default {
     });
 
     teachersCollection.doc(this.$route.params.teacher_uid)
-      .get()
-      .then(doc => {
-        this.namef = doc.data().name_f;
-        this.namel = doc.data().name_l;
-        document.title = 'IBNP - ' + this.namef + ' ' + this.namel || 'IBNP'
-        this.schoolsRef = doc.data().schoolsRef;
-        this.schoolsRef.forEach(elem => {
-          schoolsCollection
-            .doc(elem)
-            .get()
-            .then(doc2 => {
-              const data = {
-                id: doc2.id,
-                name: doc2.data().name
-              }
-              this.schoolsList.push(data);
-            })
-        })
-        this.userRef = doc.data().userRef;
-        this.subjects = doc.data().subjects;
-        this.loading = false;
+    .get()
+    .then(doc => {
+      this.teacherRef = doc.id;
+      this.namef = doc.data().name_f;
+      this.namel = doc.data().name_l;
+      document.title = 'IBNP - ' + this.namef + ' ' + this.namel || 'IBNP'
+      this.schoolsRef = doc.data().schoolsRef;
+      this.schoolsRef.forEach(elem => {
+        schoolsCollection
+          .doc(elem)
+          .get()
+          .then(doc2 => {
+            const data = {
+              id: doc2.id,
+              name: doc2.data().name
+            }
+            this.schoolsList.push(data);
+          })
       })
+      this.userRef = doc.data().userRef;
+      this.subjects = doc.data().subjects;
+      this.loading = false;
 
+      //Aktualizowanie metadanych
+      var currentDate = new Date();
+      viewsCollection
+      .doc()
+      .set({
+        date: currentDate,
+        schoolsRef: this.schoolsRef,
+        teacherRef: this.teacherRef,
+        userRef: this.userID,
+        userIP: this.userIP
+      })
+      .then(() => {
+        console.log("Successfully addedd click");
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
+    })
     
     //Powiedzenia tego nauczyciela
     factsCollection
@@ -347,8 +370,10 @@ export default {
 
 <style scoped>
 .v-card {
-  border-radius: 24px !important;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
+}
+.v-card--flat {
+  min-width: auto;
 }
 .blockquote-old {
   border-left: 4px solid #8bc34a;
@@ -356,5 +381,9 @@ export default {
   margin-left: 5px;
   padding: 5px;
   min-height: 28px;
+}
+.multiline-element {
+  white-space: pre-line;
+  word-wrap: break-word;
 }
 </style>

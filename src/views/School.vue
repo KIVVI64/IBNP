@@ -1,7 +1,11 @@
 <template>
   <div class="school">
     <div id="container">
-      <v-card elevation="20" z-index="10">
+      <v-card
+      elevation="8"
+      class="rounded-xl"
+      z-index="10"
+      >
         <v-card-text>
           <div>Szkoła</div>
           <h1 class="display-1 text--primary">
@@ -42,7 +46,11 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <v-card elevation="20" :loading="popLoading">
+      <v-card
+      elevation="8" 
+      class="rounded-xl"
+      :loading="popLoading"
+      >
         <v-list avatar>
           <v-subheader>Popularni nauczyciele</v-subheader>
           <div v-if="!teachersList[0] && !popLoading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
@@ -78,10 +86,13 @@
         </v-list>
 
         <v-card-actions>
-          <v-btn rounded small block color="secondary" dark :loading="popLoading" @click="loadMore()">Pełna lista</v-btn>
+          <v-btn rounded block color="secondary" dark :loading="popLoading" @click="loadMore()">Pełna lista</v-btn>
         </v-card-actions>
       </v-card>
-      <v-card elevation="20">
+      <v-card
+      elevation="8"
+      class="rounded-xl"
+      >
         <v-list two-line>
           <v-subheader>Szkoły w okolicy</v-subheader>
           <v-list-item
@@ -100,10 +111,13 @@
         </v-list>
 
         <v-card-actions>
-          <v-btn rounded small block color="secondary" dark>Pełna lista</v-btn>
+          <v-btn rounded block color="secondary" dark>Pełna lista</v-btn>
         </v-card-actions>
       </v-card>
-      <v-card elevation="20">
+      <v-card
+      elevation="8"
+      class="rounded-xl"
+      >
         <v-card-text>
           <canvas id="my-chart" width="100%" height="50px"></canvas>
         </v-card-text>
@@ -136,10 +150,10 @@ export default {
       teachersList: [],
       popLoading: true,
       items: [
-        { active: true, title: 'Jason Oner', avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg', subtitle: '9 nauczycieli' },
-        { active: true, title: 'Ranee Carlson', avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg', subtitle: '41 nauczycieli' },
-        { title: 'Cindy Baker', avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg', subtitle: '1 nauczyciel' },
-        { title: 'Ali Connors', avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg', subtitle: '15 nauczycieli' },
+        { title: 'Chemik', avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg', subtitle: '9 nauczycieli' },
+        { title: 'Dziewiątka', avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg', subtitle: '41 nauczycieli' },
+        { title: 'Czart', avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg', subtitle: '1 nauczyciel' },
+        { title: 'Piątka', avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg', subtitle: '15 nauczycieli' },
       ],
       
       // Meta
@@ -292,7 +306,7 @@ export default {
 
 <style>
 .v-card {
-  border-radius: 18px !important;
-  width: 360px;
+  min-width: 334px;
+  width: 100%;
 }
 </style>
