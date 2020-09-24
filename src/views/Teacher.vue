@@ -2,7 +2,7 @@
   <div class="teacher">
     <v-row>
       <v-col cols="12" sm="12" md="8" xl="9">
-        <v-card elevation="8" class="mx-auto rounded-xl" width="100%">
+        <v-card elevation="8" class="mx-auto rounded-xl main-card" width="100%">
           <v-card-text>
             <v-skeleton-loader
               :loading="loading"
@@ -31,7 +31,7 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-        <v-card elevation="8" class="mx-auto rounded-xl" width="100%">
+        <v-card elevation="8" class="mx-auto rounded-xl main-card" width="100%">
           <v-card-title>
             Powiedzenia
           </v-card-title>
@@ -43,7 +43,7 @@
             >
               <v-expansion-panels accordion flat>
                 <v-expansion-panel v-for="info in says" :key="info.id">
-                  <v-expansion-panel-header>{{ info.content }}</v-expansion-panel-header>
+                  <v-expansion-panel-header class="multiline-element">{{ info.content }}</v-expansion-panel-header>
                   <v-expansion-panel-content>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                   </v-expansion-panel-content>
@@ -54,12 +54,42 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
+            <v-dialog v-model="saysDialog" max-width="600px">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  outlined
+                  rounded
+                  color="secondary"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Dodaj więcej
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  <span class="headline">Dodaj nowe powiedzenie</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-textarea
+                    v-model="content"
+                    auto-grow
+                    label="Napisz coś śmiesznego"
+                    single-line
+                  >
+                  </v-textarea>
+                  <p class="text-caption">*twoja informacja będzie dostępna publicznie po jej zwerefikowaniu*</p>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue darken-1" text @click="saysDialog = false">Anuluj</v-btn>
+                  <v-btn color="blue darken-1" text @click="factAdd('powiedzenia')">Dodaj</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-card-actions>
         </v-card>
-        <v-card elevation="8" class="mx-auto rounded-xl" width="100%">
+        <v-card elevation="8" class="mx-auto rounded-xl main-card" width="100%">
           <v-card-title>
             Ciekawostki
           </v-card-title>
@@ -80,9 +110,39 @@
             </v-skeleton-loader>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn outlined rounded color="secondary" dark>
-              Dodaj więcej
-            </v-btn>
+            <v-dialog v-model="factsDialog" max-width="600px">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  outlined
+                  rounded
+                  color="secondary"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Dodaj więcej
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  <span class="headline">Dodaj nową ciekawostkę</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-textarea
+                    v-model="content"
+                    auto-grow
+                    label="Napisz coś śmiesznego"
+                    single-line
+                  >
+                  </v-textarea>
+                  <p class="text-caption">*twoja informacja będzie dostępna publicznie po jej zwerefikowaniu*</p>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue darken-1" text @click="factsDialog = false">Anuluj</v-btn>
+                  <v-btn color="blue darken-1" text @click="factAdd('ciekawostki')">Dodaj</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-card-actions>
         </v-card>
 
@@ -103,40 +163,6 @@
         <p>Imie Nazwisko</p>
         <p>Imie Nazwisko</p>
       </v-col>
-    </v-row>
-
-    <v-row justify="center">
-      <v-dialog v-model="dialog" max-width="600px">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="primary"
-            dark
-            v-bind="attrs"
-            v-on="on"
-          >
-            Dodaj informacje
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            <span class="headline">Dodaj informacje</span>
-          </v-card-title>
-          <v-card-text>
-            <v-textarea
-              v-model="content"
-              auto-grow
-              label="Napisz coś śmiesznego"
-              single-line
-            >
-            </v-textarea>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="dialog = false">Anuluj</v-btn>
-            <v-btn color="blue darken-1" text @click="factAdd()">Dodaj</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-row>
 
     <v-dialog
@@ -209,6 +235,8 @@ export default {
       
       // Meta
       dialog: false,
+      factsDialog: false,
+      saysDialog: false,
       erno: false,
       loading: true,
       saying_loading: true,
@@ -286,7 +314,7 @@ export default {
       this.loading = false;
 
       //Aktualizowanie metadanych
-      var currentDate = new Date();
+      let currentDate = new Date();
       viewsCollection
       .doc()
       .set({
@@ -343,8 +371,8 @@ export default {
       })
   },
   methods: {
-    factAdd() {
-      var currentDate = new Date();
+    factAdd(section) {
+      let currentDate = new Date();
       // console.log(currentDate.getTime());
 
       factsCollection
@@ -352,16 +380,19 @@ export default {
         .set({
           accessLevel: 1,
           code: currentDate.getTime(),
-          content: this.content.replace(/\r\n/g, "<br />"),
+          content: this.content,
           date: currentDate,
           editPoints: this.userPoints,
           ip: this.userIP,
-          section: "ciekawostki",
+          section: section,
           teacherRef: this.$route.params.teacher_uid,
           userRef: this.userID,
           verificated: true
         })
-        .then(() => this.dialog = false)
+        .then(() => {
+          this.factsDialog = false;
+          this.saysDialog = false;
+        })
         .catch(err => console.log(err.message));
     }
   }
@@ -369,11 +400,8 @@ export default {
 </script>
 
 <style scoped>
-.v-card {
+.main-card {
   margin-bottom: 12px;
-}
-.v-card--flat {
-  min-width: auto;
 }
 .blockquote-old {
   border-left: 4px solid #8bc34a;

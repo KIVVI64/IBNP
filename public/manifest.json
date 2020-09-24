@@ -1,7 +1,7 @@
 {
   "name":"IBNP - Szczerze o nauczycielach",
   "short_name":"IBNP",
-  "theme_color":"#8bc34a",
+  "theme_color":"#7cb342",
   "icons":[
     {
       "src":"./img/icons/android-chrome-192x192.png",
