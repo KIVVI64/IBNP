@@ -307,6 +307,7 @@ export default {
 <style>
 .v-card {
   min-width: 334px;
+  max-width: 540px;
   width: 100%;
 }
 </style>
