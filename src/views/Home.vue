@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1 class="text-center text-h1">IBNP</h1>
+    <h1 class="text-center text-h1">IBNP <small>BETA</small></h1>
     <p class="text-center text-subtitle-1">Internetowa baza nauczycieli w Polsce</p>
     <v-form>
       <v-container>
