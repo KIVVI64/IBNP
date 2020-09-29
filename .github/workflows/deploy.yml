@@ -19,11 +19,13 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@master
-      
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+      - name: Installing project dependencies
+      - run: npm install
+      - name: Building the project
+      - run: npm run build
+      - uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting
         env:
