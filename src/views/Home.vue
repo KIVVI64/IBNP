@@ -1,6 +1,14 @@
 <template>
   <div class="home">
-    <h1 class="text-center text-h1">IBNP <small>BETA</small></h1>
+    <div class="text-center">
+      <v-badge
+        color="accent"
+        content="BETA"
+        overlap
+      >
+        <h1 class="text-h1">IBNP</h1>
+      </v-badge>
+    </div>
     <p class="text-center text-subtitle-1">Internetowa baza nauczycieli w Polsce</p>
     <v-form>
       <v-container>
@@ -166,7 +174,6 @@ export default {
       schoolsCollection
       .where("city", "==", this.city)
       .where("name", "==", this.school)
-      .orderBy("code", "asc")
       .limit(1)
       .get()
       .then(doc => {

@@ -42,6 +42,11 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "school_add" */ '../views/School.vue'),
   },
   {
+    path: '/szkola/:school_uid/edycja',
+    name: 'SchoolEdit',
+    component: () => import(/* webpackChunkName: "school_add" */ '../views/SchoolEdit.vue'),
+  },
+  {
     path: '/nauczyciel/dodaj',
     name: 'TeacherAdd',
     component: () => import(/* webpackChunkName: "school_add" */ '../views/TeacherAdd.vue'),

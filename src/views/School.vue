@@ -5,46 +5,67 @@
       elevation="8"
       class="rounded-xl"
       z-index="10"
+      :loading="loading"
       >
-        <v-card-text>
-          <div>Szkoła</div>
-          <h1 class="display-1 text--primary">
-            {{ name }}
-          </h1>
-          <v-chip-group
-            active-class="deep-purple accent-4 white--text"
-            column
-          >
-            <v-chip v-for="level in levels" :key="level"> {{ level}} </v-chip>
-          </v-chip-group>
-          <v-row
-            align="center"
-            class="mx-0"
-          >
-            <v-rating
-              :value="4.5"
-              color="amber"
-              dense
-              half-increments
-              readonly
-              size="14"
-            ></v-rating>
+        <v-skeleton-loader
+          :loading="loading"
+          transition="fade-transition"
+          type="article"
+        >
+          <v-card-text>
+            <div>Szkoła</div>
+            <h1 class="display-1 text--primary">
+              {{ name }}
+            </h1>
+            <div class="d-inline-flex" v-if="subnames.length">
+              <span class="aka text-overline">AKA</span>
+              <v-chip-group
+                active-class="deep-purple accent-4 white--text"
+                column
+              >
+                <v-chip small v-for="subname in subnames" :key="subname"> {{ subname }} </v-chip>
+              </v-chip-group>
+            </div>
+          </v-card-text>
+        </v-skeleton-loader>
+        <v-divider></v-divider>
+        <v-skeleton-loader
+          :loading="loading"
+          type="list-item-avatar-two-line@3"
+        >
+        <span>
+          <v-simple-table>
+            <tbody>
+              <tr>
+                <td>Adres</td>
+                <td>{{ address }}</td>
+              </tr>
+              <tr>
+                <td>Nauczyciele</td>
+                <td>{{ teachersList.length }}</td>
+              </tr>
+              <tr>
+                <td>Poziomy</td>
+                <td>
+                  <p v-if="!levels.length">Nie podano</p>
+                  <v-chip small v-for="level in levels" :key="level"> {{ level }} </v-chip>
+                </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
 
-            <div class="grey--text ml-4">4.5 (413)</div>
-          </v-row>
-        </v-card-text>
-
-        <v-list-item>
-          <v-icon class="mr-3">mdi-map-marker</v-icon>
-          <v-list-item-subtitle>{{ address }}</v-list-item-subtitle>
-        </v-list-item>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn icon>
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </v-card-actions>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              icon
+              v-if="(userPoints >= editPoints) && !waitingForCheck"
+              :to="{ name: 'SchoolEdit', params: { school_uid: this.school_uid } }"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </span>
+        </v-skeleton-loader>
       </v-card>
       <v-card
       elevation="8" 
@@ -123,6 +144,231 @@
         </v-card-text>
       </v-card>
     </div>
+
+    <v-dialog
+      persistent
+      scrollable
+      v-model="erno"
+    >
+      <v-card>
+        <v-card-title class="headline">Szukaliśmy wszędzie 😞</v-card-title>
+
+        <v-card-text>
+          Niestety nie możemy znaleźć szkoły, którą chcesz zobaczyć. Naprawdę nie mam pojęcia co się z nią stało 😕
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            text
+            @click="$router.go(-1)"
+          >
+            Wróć
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            text
+            @click="dialog = false"
+          >
+            Dodaj nową szkołę
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            text
+            @click="dialog = false"
+          >
+            Przejdź na główną
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
+
+    <v-row justify="center">
+      <v-alert
+        v-if="NewInfoAlert"
+        dismissible
+        dark
+        prominent
+        color="black"
+        elevation="24"
+        type="info"
+        class="fixed rounded-t-xl"
+      >
+        <v-row align="center">
+          <v-col class="grow">
+            Nowe informacje do sprawdzenia
+          </v-col>
+          <v-col class="shrink">
+            <v-btn
+              outlined
+              small
+              @click="loadNewData()"
+            >Zobacz</v-btn>
+          </v-col>
+        </v-row>
+      </v-alert>
+
+      <v-dialog
+        v-model="NewInfoDialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <v-card>
+          <v-toolbar
+            dark
+            color="black"
+          >
+            <v-btn
+              icon
+              dark
+              @click="NewInfoDialog = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Do sprawdzenia</v-toolbar-title>
+          </v-toolbar>
+
+          <!--<div class="d-flex justify-space-around">
+            <v-alert
+              border="left"
+              colored-border
+              dense
+              color="red"
+            > Stara informacja
+            </v-alert>
+            <v-alert
+              border="left"
+              colored-border
+              dense
+              color="green"
+            > Nowa informacja
+            </v-alert>
+          </div>-->
+
+          <v-list
+            three-line
+            subheader
+            v-if="name !== nameNew"
+          >
+            <v-subheader>Nazwa szkoły</v-subheader>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="red"
+              > {{ name }}
+              </v-alert>
+            </v-list-item>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="green"
+              > {{ nameNew }}
+              </v-alert>
+            </v-list-item>
+            <v-divider></v-divider>
+          </v-list>
+          <v-list
+            three-line
+            subheader
+            v-if="subnames.length !== subnamesNew.length || subnames[0] !== subnamesNew [0]"
+          >
+            <v-subheader>Nazwy potoczne</v-subheader>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="red"
+              >
+                <v-chip-group>
+                  <v-chip v-for="subname in subnames" :key="subname"> {{ subname }} </v-chip>
+                </v-chip-group>
+              </v-alert>
+            </v-list-item>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="green"
+              >
+                <v-chip-group>
+                  <v-chip v-for="subnameNew in subnamesNew" :key="subnameNew"> {{ subnameNew }} </v-chip>
+                </v-chip-group>
+              </v-alert>
+            </v-list-item>
+            <v-divider></v-divider>
+          </v-list>
+          <v-list
+            three-line
+            subheader
+            v-if="levels.length !== levelsNew.length || levels[0] !== levelsNew [0]"
+          >
+            <v-subheader>Poziomy</v-subheader>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="red"
+              >
+                <v-chip-group>
+                  <v-chip v-for="level in levels" :key="level"> {{ level }} </v-chip>
+                </v-chip-group>
+              </v-alert>
+            </v-list-item>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="green"
+              >
+                <v-chip-group>
+                  <v-chip v-for="levelNew in levelsNew" :key="levelNew"> {{ levelNew }} </v-chip>
+                </v-chip-group>
+              </v-alert>
+            </v-list-item>
+            <v-divider></v-divider>
+          </v-list>
+          <v-list
+            three-line
+            subheader
+            v-if="address !== addressNew"
+          >
+            <v-subheader>Adres</v-subheader>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="red"
+              > {{ address }}
+              </v-alert>
+            </v-list-item>
+            <v-list-item>
+              <v-alert
+                border="left"
+                colored-border
+                dense
+                color="green"
+              > {{ addressNew }}
+              </v-alert>
+            </v-list-item>
+            <v-divider></v-divider>
+          </v-list>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </div>
 </template>
 
@@ -141,9 +387,15 @@ export default {
       // Szkoła
       school_uid: null,
       name: "",
+      nameNew: "",
       city: null,
+      editPoints: 0,
       levels: [],
+      levelsNew: [],
+      subnames: [],
+      subnamesNew: [],
       address: null,
+      addressNew: null,
       userRef: null, // id osoby dodającej szkołę
 
       //Nauczyciele
@@ -160,6 +412,9 @@ export default {
       dialog: false,
       erno: false,
       loading: true,
+      waitingForCheck: false,
+      NewInfoAlert: false,
+      NewInfoDialog: false,
 
       //User add
       userIP: null,
@@ -179,7 +434,7 @@ export default {
             document.title = 'IBNP - ' + vm.name || 'IBNP';
           });
         } else {
-          console.log("Nie znaleziono tej szkoły!", "Spadaj z tej strony");
+          console.log("Spadaj z tej strony", "Nie ma tej szkoły!");
           next(vm => {
             vm.erno = true;
           })
@@ -207,17 +462,21 @@ export default {
     schoolsCollection.doc(this.$route.params.school_uid)
       .get()
       .then(doc => {
+        this.waitingForCheck = doc.data().waitingForCheck || false;
+        if (this.waitingForCheck == true) { this.NewInfoAlert = true; }
         this.name = doc.data().name;
         this.city = doc.data().city;
-        this.levels = doc.data().levels;
-        this.address = doc.data().address;
+        this.levels = doc.data().levels || [];
+        this.subnames = doc.data().subnames || [];
+        this.address = doc.data().address || "Nie podano";
+        this.editPoints = doc.data().editPoints || 0;
+        this.loading = false;
       });
     
     // Ładownie pop nauczycieli
     this.popLoading = true;
     teachersCollection
       .where("schoolsRef", "array-contains", this.$route.params.school_uid)
-      .limit(3)
       .get()
       .then(doc => {
         doc.forEach(elem => {
@@ -299,6 +558,19 @@ export default {
         })
         this.popLoading = false;
       })
+    },
+    loadNewData() {
+      schoolsCollection.doc(this.$route.params.school_uid)
+      .get()
+      .then(doc => {
+        this.nameNew = doc.data().nameNew;
+        this.levelsNew = doc.data().levelsNew || [];
+        this.subnamesNew = doc.data().subnamesNew || [];
+        this.addressNew = doc.data().addressNew || "Nie podano";
+
+        this.NewInfoDialog = true,
+        this.NewInfoAlert = false
+      });
     }
   }
 }
@@ -309,5 +581,15 @@ export default {
   min-width: 334px;
   max-width: 540px;
   width: 100%;
+}
+.aka {
+  line-height: 40px !important;
+  margin-right: 8px;
+}
+.fixed {
+  position: fixed;
+  bottom: 0;
+  z-index: 1000;
+  margin-bottom: -3px;
 }
 </style>

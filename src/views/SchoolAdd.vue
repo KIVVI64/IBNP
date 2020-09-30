@@ -173,7 +173,6 @@ export default {
       .set({
         address: this.address,
         city: this.city,
-        code: currentDate.getTime(),
         date: currentDate,
         editPoints: this.userPoints,
         ip: this.userIP,

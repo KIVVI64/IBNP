@@ -53,9 +53,7 @@
       <v-btn v-if="!user" outlined :to="{ name: 'Login', query: { redirect: $route.fullPath } }">Login</v-btn>
     </v-app-bar>
     <v-main>
-      <v-container fluid>
       <router-view></router-view>
-      </v-container>
     </v-main>
   </v-app>
 </template>
