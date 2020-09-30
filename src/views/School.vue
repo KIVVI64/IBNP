@@ -369,6 +369,25 @@
         </v-card>
       </v-dialog>
     </v-row>
+
+    <v-dialog
+      v-model="pointsPopup"
+      elevation="24"
+      transition="fab-transition"
+      max-width="160px"
+      class="border"
+    >
+      <v-card
+      class="text-center rounded-circle"
+      color="secondary"
+      height="160px"
+      >
+        <div class="d-flex flex-column align-center pa-4">
+          <span class="white--text overline">Zdobywasz</span>
+          <span class="white--text display-4">{{ pointsEarned }}<span class="display-2">p</span></span>
+        </div>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -415,12 +434,21 @@ export default {
       waitingForCheck: false,
       NewInfoAlert: false,
       NewInfoDialog: false,
+      pointsPopup: false,
+      pointsEarned: 0,
 
       //User add
       userIP: null,
       userID: null,
       userPoints: null,
     }
+  },
+  watch: {
+    pointsPopup (val) {
+      if (!val) return
+
+      setTimeout(() => (this.pointsPopup = false), 1500)
+    },
   },
   beforeRouteEnter(to, from, next) {
     //Podstawowe dane nauczycielas
@@ -459,11 +487,18 @@ export default {
         this.userIP = ip;
     });
 
+    //Punkty
+    if (this.$route.query.points) {
+      this.pointsEarned = this.$route.query.points || 0;
+      this.$router.replace('/szkola/'+this.$route.params.school_uid);
+      if (this.pointsEarned != 0) this.pointsPopup = true;
+    }
+
     schoolsCollection.doc(this.$route.params.school_uid)
       .get()
       .then(doc => {
         this.waitingForCheck = doc.data().waitingForCheck || false;
-        if (this.waitingForCheck == true) { this.NewInfoAlert = true; }
+        if (this.waitingForCheck == true && user) { this.NewInfoAlert = true; }
         this.name = doc.data().name;
         this.city = doc.data().city;
         this.levels = doc.data().levels || [];
@@ -577,10 +612,13 @@ export default {
 </script>
 
 <style>
-.v-card {
+.v-card.rounded-xl {
   min-width: 334px;
   max-width: 540px;
   width: 100%;
+}
+.v-dialog.border {
+  border-radius: 100px !important;
 }
 .aka {
   line-height: 40px !important;
@@ -589,7 +627,7 @@ export default {
 .fixed {
   position: fixed;
   bottom: 0;
-  z-index: 1000;
+  z-index: 220;
   margin-bottom: -3px;
 }
 </style>
