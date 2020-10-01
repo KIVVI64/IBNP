@@ -438,6 +438,7 @@ export default {
       pointsEarned: 0,
 
       //User add
+      user: auth.currentUser,
       userIP: null,
       userID: null,
       userPoints: null,
@@ -471,9 +472,8 @@ export default {
   },
   created() {
     // Dane usera
-    let user = auth.currentUser;
-    if (user) {
-      this.userID = user.uid;
+    if (this.user) {
+      this.userID = this.user.uid;
       usersCollection.doc(this.userID)
         .get()
         .then(doc => {
@@ -498,7 +498,7 @@ export default {
       .get()
       .then(doc => {
         this.waitingForCheck = doc.data().waitingForCheck || false;
-        if (this.waitingForCheck == true && user) { this.NewInfoAlert = true; }
+        if (this.waitingForCheck == true && this.user) { this.NewInfoAlert = true; }
         this.name = doc.data().name;
         this.city = doc.data().city;
         this.levels = doc.data().levels || [];
