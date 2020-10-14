@@ -1,6 +1,6 @@
 <template>
   <div class="teacher">
-    <v-row>
+    <v-row no-gutters>
       <v-col cols="12" sm="12" md="8" xl="9">
         <v-card elevation="8" class="mx-auto rounded-xl main-card" width="100%">
           <v-card-text>
@@ -10,14 +10,27 @@
               type="article"
             >
               <v-card flat>
-                <h1 class="display-2">{{ namef }} {{ namel }}</h1>
+                <div class="text-center">
+                  <v-avatar
+                    size="180"
+                    rounted
+                    class="mb-3"
+                  >
+                    <img
+                      src="https://uczenplus.pl/FILES/teacher/teacher.jpeg"
+                      :alt="namef"
+                    >
+                  </v-avatar>
+                </div>
+                
+                <h1 class="display-2 text-center">{{ namef }} {{ namel }}</h1>
                 <!--<p class="display-1">{{ new_namef }} {{ new_namel }}</p>-->
-                <p>Szkoła:</p>
+                <p class="mt-3 mb-1">Szkoła:</p>
                 <v-chip class="mr-2 mb-2" v-for="school in schoolsList" :to="{ name: 'School', params: { school_uid: school.id } }" :key="school.id" >
                   {{ school.name }}
                   <v-icon class="mr-1" small right>mdi-open-in-new</v-icon>
                 </v-chip>
-                <p>Przedmioty: </p>
+                <p class="mt-3 mb-1">Przedmioty:</p>
                 <v-chip class="mr-2 mb-2" v-for="subject in subjects" :key="subject">
                   {{ subject }}
                 </v-chip>

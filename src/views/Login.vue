@@ -1,6 +1,6 @@
 <template>
   <span>
-    <v-tabs v-model="tabs" centered>
+    <v-tabs v-model="tabs" centered class="pa-5">
       <v-tab>Rejestracja</v-tab>
       <v-tab>Logowanie</v-tab>
     </v-tabs>
@@ -9,7 +9,7 @@
       class="fixed"
       v-model="alert"
       close-text="Close"
-      color="error"
+      type="error"
       dark
       dismissible
     >
@@ -27,6 +27,7 @@
                 type="text"
                 name="name"
                 outlined
+                rounded
                 required
               ></v-text-field>
               <v-text-field
@@ -34,6 +35,7 @@
                 label="E-mail"
                 type="email"
                 outlined
+                rounded
                 required
               ></v-text-field>
               <v-text-field
@@ -41,14 +43,15 @@
                 label="Hasło"
                 type="password"
                 outlined
+                rounded
                 required
               ></v-text-field>
 
               <v-btn
                 block
-                outlined
+                rounded
                 large
-                color="primary"
+                color="secondary"
                 dark
                 @click.prevent="register"
                 >Załóż konto
@@ -66,6 +69,7 @@
                 label="E-mail"
                 type="email"
                 outlined
+                rounded
                 required
               ></v-text-field>
               <v-text-field
@@ -73,14 +77,15 @@
                 label="Hasło"
                 type="password"
                 outlined
+                rounded
                 required
               ></v-text-field>
 
               <v-btn
                 block
-                outlined
+                rounded
                 large
-                color="primary"
+                color="secondary"
                 dark
                 @click.prevent="login"
                 >Zaloguj
@@ -111,7 +116,7 @@ export default {
     };
   },
   created() {
-    if (this.$route.query.redirect) {
+    if (this.$route.query.showAlert) {
       this.err = "Zaloguj się aby zyskać dostęp";
       this.alert = true;
     }

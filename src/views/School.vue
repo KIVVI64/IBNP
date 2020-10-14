@@ -188,29 +188,32 @@
 
 
     <v-row justify="center">
-      <v-alert
-        v-if="NewInfoAlert"
-        dismissible
+      <v-snackbar
+        v-model="NewInfoAlert"
         dark
-        prominent
-        color="black"
-        elevation="24"
-        type="info"
-        class="fixed rounded-t-xl"
+        timeout="6000"
       >
-        <v-row align="center">
-          <v-col class="grow">
-            Nowe informacje do sprawdzenia
-          </v-col>
-          <v-col class="shrink">
-            <v-btn
-              outlined
-              small
-              @click="loadNewData()"
-            >Zobacz</v-btn>
-          </v-col>
-        </v-row>
-      </v-alert>
+        Nowe informacje do sprawdzenia
+        <template v-slot:action="{ attrs }">
+        <v-btn
+          outlined
+          small
+          color="accent"
+          v-bind="attrs"
+          @click="loadNewData()"
+        >
+          Zobacz
+        </v-btn>
+        <v-btn
+          small
+          text
+          v-bind="attrs"
+          @click="NewInfoAlert = false"
+        >
+          X
+        </v-btn>
+      </template>
+      </v-snackbar>
 
       <v-dialog
         v-model="NewInfoDialog"

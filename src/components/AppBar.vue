@@ -33,7 +33,7 @@
     <v-app-bar
       :clipped-left="$vuetify.breakpoint.lgAndUp"
       app
-      color="light-green darken-1"
+      color="primary"
       dark
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
@@ -45,7 +45,7 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
+        <v-icon>mdi-heart-outline</v-icon>
       </v-btn>
       <v-btn v-if="user" icon>
         <v-icon>mdi-account-circle</v-icon>

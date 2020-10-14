@@ -6,7 +6,7 @@ import ViewNotFound from '../views/ViewNotFound.vue'
 
 Vue.use(VueRouter)
 
-  const routes = [
+const routes = [
   {
     path: '/',
     name: 'Home',
@@ -72,7 +72,10 @@ Vue.use(VueRouter)
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior() {
+    return { x: 0, y: 0 }
+  }
 })
 
 // Nav Guards
@@ -83,7 +86,8 @@ router.beforeEach((to, from, next) => {
     next({
       path: "/login",
       query: {
-        redirect: to.fullPath
+        redirect: to.fullPath,
+        showAlert: 'access'
       }
     });
   } else {
