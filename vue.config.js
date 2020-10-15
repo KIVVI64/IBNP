@@ -4,7 +4,7 @@ module.exports = {
   ],
   pwa: {
     name: 'IBNP',
-    themeColor: '#7cb342',
+    themeColor: '#0ead69',
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
