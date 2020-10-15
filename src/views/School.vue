@@ -1,6 +1,6 @@
 <template>
   <div class="school">
-    <div id="container">
+    <div id="container" class="mt-sm-5">
       <v-card
       elevation="8"
       class="rounded-xl"
@@ -13,7 +13,7 @@
           type="article"
         >
           <v-card-text>
-            <div>Szkoła</div>
+            <div style="color: rgba(0, 0, 0, 0.6);">Szkoła</div>
             <h1 class="display-1 text--primary">
               {{ name }}
             </h1>
@@ -48,7 +48,7 @@
                 <td>Poziomy</td>
                 <td>
                   <p v-if="!levels.length">Nie podano</p>
-                  <v-chip small v-for="level in levels" :key="level"> {{ level }} </v-chip>
+                  <v-chip v-else small v-for="level in levels" :key="level"> {{ level }} </v-chip>
                 </td>
               </tr>
             </tbody>
@@ -185,8 +185,6 @@
       </v-card>
     </v-dialog>
 
-
-
     <v-row justify="center">
       <v-snackbar
         v-model="NewInfoAlert"
@@ -200,7 +198,7 @@
           small
           color="accent"
           v-bind="attrs"
-          @click="loadNewData()"
+          @click="NewInfoDialog = true, NewInfoAlert = false"
         >
           Zobacz
         </v-btn>
@@ -215,162 +213,8 @@
       </template>
       </v-snackbar>
 
-      <v-dialog
-        v-model="NewInfoDialog"
-        fullscreen
-        hide-overlay
-        transition="dialog-bottom-transition"
-      >
-        <v-card>
-          <v-toolbar
-            dark
-            color="black"
-          >
-            <v-btn
-              icon
-              dark
-              @click="NewInfoDialog = false"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-            <v-toolbar-title>Do sprawdzenia</v-toolbar-title>
-          </v-toolbar>
-
-          <!--<div class="d-flex justify-space-around">
-            <v-alert
-              border="left"
-              colored-border
-              dense
-              color="red"
-            > Stara informacja
-            </v-alert>
-            <v-alert
-              border="left"
-              colored-border
-              dense
-              color="green"
-            > Nowa informacja
-            </v-alert>
-          </div>-->
-
-          <v-list
-            three-line
-            subheader
-            v-if="name !== nameNew"
-          >
-            <v-subheader>Nazwa szkoły</v-subheader>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="red"
-              > {{ name }}
-              </v-alert>
-            </v-list-item>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="green"
-              > {{ nameNew }}
-              </v-alert>
-            </v-list-item>
-            <v-divider></v-divider>
-          </v-list>
-          <v-list
-            three-line
-            subheader
-            v-if="subnames.length !== subnamesNew.length || subnames[0] !== subnamesNew [0]"
-          >
-            <v-subheader>Nazwy potoczne</v-subheader>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="red"
-              >
-                <v-chip-group>
-                  <v-chip v-for="subname in subnames" :key="subname"> {{ subname }} </v-chip>
-                </v-chip-group>
-              </v-alert>
-            </v-list-item>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="green"
-              >
-                <v-chip-group>
-                  <v-chip v-for="subnameNew in subnamesNew" :key="subnameNew"> {{ subnameNew }} </v-chip>
-                </v-chip-group>
-              </v-alert>
-            </v-list-item>
-            <v-divider></v-divider>
-          </v-list>
-          <v-list
-            three-line
-            subheader
-            v-if="levels.length !== levelsNew.length || levels[0] !== levelsNew [0]"
-          >
-            <v-subheader>Poziomy</v-subheader>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="red"
-              >
-                <v-chip-group>
-                  <v-chip v-for="level in levels" :key="level"> {{ level }} </v-chip>
-                </v-chip-group>
-              </v-alert>
-            </v-list-item>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="green"
-              >
-                <v-chip-group>
-                  <v-chip v-for="levelNew in levelsNew" :key="levelNew"> {{ levelNew }} </v-chip>
-                </v-chip-group>
-              </v-alert>
-            </v-list-item>
-            <v-divider></v-divider>
-          </v-list>
-          <v-list
-            three-line
-            subheader
-            v-if="address !== addressNew"
-          >
-            <v-subheader>Adres</v-subheader>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="red"
-              > {{ address }}
-              </v-alert>
-            </v-list-item>
-            <v-list-item>
-              <v-alert
-                border="left"
-                colored-border
-                dense
-                color="green"
-              > {{ addressNew }}
-              </v-alert>
-            </v-list-item>
-            <v-divider></v-divider>
-          </v-list>
-        </v-card>
-      </v-dialog>
+      <NewInfoDialog v-if="NewInfoDialog" :NewInfoDialog='NewInfoDialog'/>
+      
     </v-row>
 
     <v-dialog
@@ -395,29 +239,29 @@
 </template>
 
 <script>
-import { schoolsCollection, teachersCollection } from '../plugins/firebase'
-import { auth } from '../plugins/firebase'
-import { usersCollection } from '../plugins/firebase'
+import NewInfoDialog from '@/components/NewInfoDialog.vue'
+
+import { auth } from '@/plugins/firebase'
+import { schoolsCollection, teachersCollection, usersCollection } from '@/plugins/firebase'
 
 import Chart from 'chart.js';
 import MagicGrid from "magic-grid"
 
 export default {
   name: "School",
+  components: {
+    NewInfoDialog
+  },
   data() {
     return {
       // Szkoła
       school_uid: null,
       name: "",
-      nameNew: "",
       city: null,
       editPoints: 0,
       levels: [],
-      levelsNew: [],
       subnames: [],
-      subnamesNew: [],
       address: null,
-      addressNew: null,
       userRef: null, // id osoby dodającej szkołę
 
       //Nauczyciele
@@ -500,7 +344,7 @@ export default {
     schoolsCollection.doc(this.$route.params.school_uid)
       .get()
       .then(doc => {
-        this.waitingForCheck = doc.data().waitingForCheck || false;
+        this.waitingForCheck = doc.data().waitingForCheck;
         if (this.waitingForCheck == true && this.user) { this.NewInfoAlert = true; }
         this.name = doc.data().name;
         this.city = doc.data().city;
@@ -548,8 +392,8 @@ export default {
         datasets: [{
           label: 'Popularność',
           data: [300, 700, 450, 750, 450],
-          borderColor: "#512da8",
-          backgroundColor: "#8559da",
+          borderColor: "#540d6e",
+          backgroundColor: "#763d8b",
           borderWidth: 6,
           pointRadius: 0
         }],
@@ -596,19 +440,6 @@ export default {
         })
         this.popLoading = false;
       })
-    },
-    loadNewData() {
-      schoolsCollection.doc(this.$route.params.school_uid)
-      .get()
-      .then(doc => {
-        this.nameNew = doc.data().nameNew;
-        this.levelsNew = doc.data().levelsNew || [];
-        this.subnamesNew = doc.data().subnamesNew || [];
-        this.addressNew = doc.data().addressNew || "Nie podano";
-
-        this.NewInfoDialog = true,
-        this.NewInfoAlert = false
-      });
     }
   }
 }

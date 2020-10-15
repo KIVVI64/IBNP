@@ -25,6 +25,7 @@ const schoolsCollection = db.collection('schools')
 const usersCollection = db.collection('users')
 const viewsCollection = db.collection('views')
 const pointsCollection = db.collection('points')
+const editsCollection = db.collection('edits')
 
 // export that biatch
 export {
@@ -35,5 +36,6 @@ export {
   usersCollection,
   factsCollection,
   viewsCollection,
-  pointsCollection
+  pointsCollection,
+  editsCollection
 }
