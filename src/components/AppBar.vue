@@ -47,7 +47,7 @@
       <v-btn icon>
         <v-icon>mdi-heart-outline</v-icon>
       </v-btn>
-      <v-btn v-if="user" icon>
+      <v-btn v-if="user" icon :to="{ name: 'Account' }">
         <v-icon>mdi-account-circle</v-icon>
       </v-btn>
       <v-btn v-if="!user" outlined :to="{ name: 'Login', query: { redirect: $route.fullPath } }">Login</v-btn>

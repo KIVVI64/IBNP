@@ -93,7 +93,7 @@ export default {
       ],
       address: null,
       addressRules: [
-        v => !!v || 'Fajnie by było jakbyś wpisał(a) chociaż ulicę i nr'
+        v => (v && v.length >= 10) || 'Fajnie by było jakbyś wpisał(a) chociaż ulicę i nr'
       ],
       levels: [],
 
@@ -169,19 +169,23 @@ export default {
     schoolAdd() {
       var currentDate = new Date();
       schoolsCollection
-      .doc()
-      .set({
+      .add({
         address: this.address,
+        addressPoints: this.userPoints,
         city: this.city,
         date: currentDate,
-        editPoints: this.userPoints,
         ip: this.userIP,
         levels: this.levels,
+        levelsPoints: this.userPoints,
         name: this.name,
+        namePoints: this.userPoints,
         userRef: this.userID,
         voivodeship: this.voivodeship
       })
-      .then(() => console.log("Successfully addedd schooll"))
+      .then(docRef => {
+        console.log("Dodano szkołę pod ID: ", docRef.id);
+        this.$router.push({ name: 'School', params: { school_uid: docRef.id }, query: { points: 50 } });
+      })
       .catch(err => console.log(err.message));
     }
   }

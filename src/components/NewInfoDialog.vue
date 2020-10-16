@@ -1,74 +1,104 @@
 <template>
-  <v-dialog
-    class="new-info-dialog"
-    v-model="NewInfoDialog"
-    fullscreen
-    hide-overlay
-    transition="dialog-bottom-transition"
-  >
-    <v-card>
-      <v-toolbar
-        dark
-        color="black"
+  <v-row justify="center">
+    <v-snackbar
+      v-model="NewInfoAlert"
+      dark
+      timeout="6000"
+    >
+      Nowe informacje do sprawdzenia
+      <template v-slot:action="{ attrs }">
+      <v-btn
+        outlined
+        small
+        color="accent"
+        v-bind="attrs"
+        @click="NewInfoDialog = true, NewInfoAlert = false"
       >
-        <v-btn
-          icon
+        Zobacz
+      </v-btn>
+      <v-btn
+        small
+        text
+        v-bind="attrs"
+        @click="NewInfoAlert = false"
+      >
+        X
+      </v-btn>
+    </template>
+    </v-snackbar>
+
+    <v-dialog
+      class="new-info-dialog"
+      v-model="NewInfoDialog"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-toolbar
           dark
-          @click="NewInfoDialog = false"
+          color="black"
         >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>Do sprawdzenia</v-toolbar-title>
-      </v-toolbar>
-
-      <!--<div class="d-flex justify-space-around">
-        <v-alert
-          border="left"
-          colored-border
-          dense
-          color="red"
-        > Stara informacja
-        </v-alert>
-        <v-alert
-          border="left"
-          colored-border
-          dense
-          color="green"
-        > Nowa informacja
-        </v-alert>
-      </div>-->
-
-      <v-card
-        flat
-        class="rounded-xl mt-4"
-        v-for="change in changesList"
-        :key="change.uid"
-      >
-        <v-card-title>{{ change.field }}</v-card-title>
-        <v-card-text class="text--primary pb-0">
-          <p><s>{{ change.oldData.toString().replace('\[\"', '').replace('\"\]', '') }}</s></p>
-          <p>{{ change.newData.toString().replace('\[\"', '').replace('\"\]', '') }}</p>
-        </v-card-text>
-        <v-card-actions>
           <v-btn
+            icon
+            dark
+            @click="NewInfoDialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Do sprawdzenia</v-toolbar-title>
+        </v-toolbar>
+
+        <!--<div class="d-flex justify-space-around">
+          <v-alert
+            border="left"
+            colored-border
+            dense
             color="red"
-            text
-            @click="cancelData(change.uid, change.pointsRef)"
-          >
-            Odrzuć
-          </v-btn>
-
-          <v-btn
+          > Stara informacja
+          </v-alert>
+          <v-alert
+            border="left"
+            colored-border
+            dense
             color="green"
-            text
-            @click="acceptData(change.uid, change.pointsRef, change.field, change.newData, change.userPoints)"
-          >
-            Potwierdź
-          </v-btn>
-        </v-card-actions>
+          > Nowa informacja
+          </v-alert>
+        </div>-->
+
+        <v-card
+          flat
+          class="rounded-xl mt-4"
+          v-for="change in changesList"
+          :key="change.uid"
+        >
+          <v-card-title>{{ change.field }}</v-card-title>
+          <v-card-text class="text--primary pb-0">
+            <p><s>{{ change.oldData.toString().replace('\[\"', '').replace('\"\]', '') }}</s></p>
+            <p>{{ change.newData.toString().replace('\[\"', '').replace('\"\]', '') }}</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              color="red"
+              text
+              @click="cancelData(change.uid, change.pointsRef)"
+            >
+              Odrzuć
+            </v-btn>
+
+            <v-btn
+              color="green"
+              text
+              @click="acceptData(change.uid, change.pointsRef, change.field, change.newData, change.userPoints)"
+            >
+              Potwierdź
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-card>
-    </v-card>
-  </v-dialog>
+    </v-dialog>
+    
+  </v-row>
 </template>
 
 <script>
@@ -77,13 +107,12 @@ import { schoolsCollection, editsCollection, usersCollection, pointsCollection }
 
 export default {
   name: 'NewInfoDialog',
-  props: {
-    NewInfoDialog: Boolean,
-  },
   data() {
     return {
       changesList: [],
       changesListLoading: true,
+      NewInfoAlert: false,
+      NewInfoDialog: false,
 
       //User add
       user: auth.currentUser,
@@ -113,6 +142,7 @@ export default {
     .where('where', '==', 'school')
     .where('objRef', '==', this.$route.params.school_uid)
     .where('verificated', '==', 'waiting')
+    .where('userRef', '!=', this.userID)
     .get()
     .then(doc => {
       doc.forEach(elem => {
@@ -126,6 +156,9 @@ export default {
         };
         this.changesList.push(data);
       })
+      if (this.changesList.length) {
+        this.NewInfoAlert = true;
+      }
       this.changesListLoading = false;
     });
   },

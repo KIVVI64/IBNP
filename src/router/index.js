@@ -21,6 +21,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
   },
   {
+    path: '/account',
+    name: 'Account',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Account.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/about',
     name: 'About',
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
@@ -45,6 +53,9 @@ const routes = [
     path: '/szkola/:school_uid/edycja',
     name: 'SchoolEdit',
     component: () => import(/* webpackChunkName: "school_add" */ '../views/SchoolEdit.vue'),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/nauczyciel/dodaj',

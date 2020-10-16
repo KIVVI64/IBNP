@@ -58,7 +58,6 @@
             <v-spacer></v-spacer>
             <v-btn
               icon
-              v-if="(userPoints >= editPoints) && !waitingForCheck"
               :to="{ name: 'SchoolEdit', params: { school_uid: this.school_uid } }"
             >
               <v-icon>mdi-pencil</v-icon>
@@ -74,7 +73,14 @@
       >
         <v-list avatar>
           <v-subheader>Popularni nauczyciele</v-subheader>
-          <div v-if="!teachersList[0] && !popLoading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
+          <div
+            v-if="!teachersList[0] && !popLoading"
+            class="text-center caption text--secondary"
+          >
+            <router-link :to="{ name: 'TeacherAdd', query: { school_uid: this.school_uid } }">
+              Dodaj pierwszego nauczyciela
+            </router-link>
+          </div>
           <v-skeleton-loader
               v-if="!teachersList[0] && popLoading"
               type="list-item-avatar@4"
@@ -185,37 +191,7 @@
       </v-card>
     </v-dialog>
 
-    <v-row justify="center">
-      <v-snackbar
-        v-model="NewInfoAlert"
-        dark
-        timeout="6000"
-      >
-        Nowe informacje do sprawdzenia
-        <template v-slot:action="{ attrs }">
-        <v-btn
-          outlined
-          small
-          color="accent"
-          v-bind="attrs"
-          @click="NewInfoDialog = true, NewInfoAlert = false"
-        >
-          Zobacz
-        </v-btn>
-        <v-btn
-          small
-          text
-          v-bind="attrs"
-          @click="NewInfoAlert = false"
-        >
-          X
-        </v-btn>
-      </template>
-      </v-snackbar>
-
-      <NewInfoDialog v-if="NewInfoDialog" :NewInfoDialog='NewInfoDialog'/>
-      
-    </v-row>
+    <NewInfoDialog v-if="user" />
 
     <v-dialog
       v-model="pointsPopup"
@@ -279,8 +255,6 @@ export default {
       erno: false,
       loading: true,
       waitingForCheck: false,
-      NewInfoAlert: false,
-      NewInfoDialog: false,
       pointsPopup: false,
       pointsEarned: 0,
 

@@ -178,7 +178,7 @@ export default {
 <style scoped>
 .fixed {
   position: fixed !important;
-  bottom: 0px;
+  bottom: 5px;
   left: 0px;
   width: 90%;
   margin-left: 5%;
