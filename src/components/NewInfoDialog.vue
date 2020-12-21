@@ -69,7 +69,7 @@
         <v-card
           flat
           class="rounded-xl mt-4"
-          v-for="change in changesList"
+          v-for="(change, key) in changesList"
           :key="change.uid"
         >
           <v-card-title>{{ change.field }}</v-card-title>
@@ -81,7 +81,7 @@
             <v-btn
               color="red"
               text
-              @click="cancelData(change.uid, change.pointsRef)"
+              @click="cancelData(change.uid, change.pointsRef), this.removeElement(key)"
             >
               Odrzuć
             </v-btn>
@@ -89,7 +89,7 @@
             <v-btn
               color="green"
               text
-              @click="acceptData(change.uid, change.pointsRef, change.field, change.newData, change.userPoints)"
+              @click="acceptData(change.uid, change.pointsRef, change.field, change.newData, change.userPoints), removeElement(key)"
             >
               Potwierdź
             </v-btn>
@@ -177,8 +177,7 @@ export default {
           verificated: false
         }, { merge: true })
         .then(() => {
-          console.log("Dorzucono punkty");
-          // Usuń obiekt z listy
+          console.log("Odrzucono punkty");
         })
       })
     },
@@ -197,7 +196,6 @@ export default {
         }, { merge: true })
         .then(() => {
           console.log("Potwierdzono punkty");
-          // Usuń obiekt z listy
         })
       })
       if (field == "Nazwa szkoły") {
@@ -244,6 +242,9 @@ export default {
           // Usuń obiekt z listy
         })
       }
+    },
+    removeElement(index) {
+      this.changesList.splice(index, 1);
     }
   }
 }

@@ -44,121 +44,8 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-        <v-card elevation="8" class="mx-auto rounded-xl main-card" width="100%">
-          <v-card-title>
-            Powiedzenia
-          </v-card-title>
-          <v-card-text>
-            <v-skeleton-loader
-              :loading="facts_loading"
-              transition="fade-transition"
-              type="list-item-three-line"
-            >
-              <v-expansion-panels accordion flat>
-                <v-expansion-panel v-for="info in says" :key="info.id">
-                  <v-expansion-panel-header class="multiline-element">{{ info.content }}</v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <div v-if="!says.length && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
-              </v-expansion-panels>
-            </v-skeleton-loader>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="saysDialog" max-width="600px">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  outlined
-                  rounded
-                  color="secondary"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  Dodaj więcej
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <span class="headline">Dodaj nowe powiedzenie</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-textarea
-                    v-model="content"
-                    auto-grow
-                    label="Napisz coś śmiesznego"
-                    single-line
-                  >
-                  </v-textarea>
-                  <p class="text-caption">*twoja informacja będzie dostępna publicznie po jej zwerefikowaniu*</p>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="saysDialog = false">Anuluj</v-btn>
-                  <v-btn color="blue darken-1" text @click="factAdd('powiedzenia')">Dodaj</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-card-actions>
-        </v-card>
-        <v-card elevation="8" class="mx-auto rounded-xl main-card" width="100%">
-          <v-card-title>
-            Ciekawostki
-          </v-card-title>
-            <v-skeleton-loader
-              :loading="saying_loading"
-              transition="fade-transition"
-              type="list-item-three-line"
-            >
-              <v-expansion-panels accordion flat>
-                <v-expansion-panel v-for="info in facts" :key="info.id">
-                  <v-expansion-panel-header class="multiline-element">{{ info.content }}</v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <div v-if="!facts.length && !facts_loading" class="text-center caption text--secondary">Brak danych do wyświetlenia</div>
-              </v-expansion-panels>
-            </v-skeleton-loader>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="factsDialog" max-width="600px">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  outlined
-                  rounded
-                  color="secondary"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  Dodaj więcej
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <span class="headline">Dodaj nową ciekawostkę</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-textarea
-                    v-model="content"
-                    auto-grow
-                    label="Napisz coś śmiesznego"
-                    single-line
-                  >
-                  </v-textarea>
-                  <p class="text-caption">*twoja informacja będzie dostępna publicznie po jej zwerefikowaniu*</p>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="factsDialog = false">Anuluj</v-btn>
-                  <v-btn color="blue darken-1" text @click="factAdd('ciekawostki')">Dodaj</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-card-actions>
-        </v-card>
-
+        <Informacje section="powiedzenia" />
+        <Informacje section="ciekawostki" />
         
 
         
@@ -223,10 +110,11 @@
 </template>
 
 <script>
-import { teachersCollection, schoolsCollection, viewsCollection } from '../plugins/firebase'
-import { factsCollection } from '../plugins/firebase'
-import { usersCollection } from '../plugins/firebase'
-import { auth } from '../plugins/firebase'
+import Informacje from '@/components/Informacje.vue'
+
+import { teachersCollection, schoolsCollection, viewsCollection } from '@/plugins/firebase'
+import { usersCollection } from '@/plugins/firebase'
+import { auth } from '@/plugins/firebase'
 
 export default {
   name: "Teacher",
@@ -261,6 +149,9 @@ export default {
       userPoints: null,
       content: null,
     }
+  },
+  components: {
+    Informacje
   },
   beforeRouteEnter(to, from, next) {
     //Podstawowe dane nauczyciela
@@ -344,70 +235,7 @@ export default {
         console.log(err.message);
       });
     })
-    
-    //Powiedzenia tego nauczyciela
-    factsCollection
-      .where("teacherRef", "==", this.$route.params.teacher_uid)
-      .where("section", "==", "powiedzenia")
-      .orderBy("date", "desc")
-      .get()
-      .then(doc => {
-        doc.forEach(elem => {
-          const data = {
-            id: elem.id,
-            content: elem.data().content,
-            section: elem.data().section,
-            date: elem.data().date
-          };
-          this.says.push(data);
-        })
-        this.saying_loading = false;
-      })
 
-    //Powiedzenia tego nauczyciela
-    factsCollection
-      .where("teacherRef", "==", this.$route.params.teacher_uid)
-      .where("section", "==", "ciekawostki")
-      .orderBy("date", "desc")
-      .get()
-      .then(doc => {
-        doc.forEach(elem => {
-          const data = {
-            id: elem.id,
-            content: elem.data().content,
-            section: elem.data().section,
-            date: elem.data().date
-          };
-          this.facts.push(data);
-        })
-        this.facts_loading = false;
-      })
-  },
-  methods: {
-    factAdd(section) {
-      let currentDate = new Date();
-      // console.log(currentDate.getTime());
-
-      factsCollection
-        .doc()
-        .set({
-          accessLevel: 1,
-          code: currentDate.getTime(),
-          content: this.content,
-          date: currentDate,
-          editPoints: this.userPoints,
-          ip: this.userIP,
-          section: section,
-          teacherRef: this.$route.params.teacher_uid,
-          userRef: this.userID,
-          verificated: true
-        })
-        .then(() => {
-          this.factsDialog = false;
-          this.saysDialog = false;
-        })
-        .catch(err => console.log(err.message));
-    }
   }
 }
 </script>
